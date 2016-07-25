@@ -194,6 +194,27 @@ function custom_function_default_format_issue_summary( $p_issue_id, $p_context =
  * @return void
  */
 function custom_function_default_issue_update_validate( $p_issue_id, BugData $p_new_issue_data, $p_bugnote_text ) {
+    # By PeterV:
+    $t_version_count = count( version_get_all_rows( $p_new_issue_data->project_id ) );
+
+    # Product version can never be blank.
+    if ( ( $t_version_count > 0 ) && ( $p_new_issue_data->version == '' ) ) {
+        error_parameters( 'Product Version' );
+        trigger_error(ERROR_EMPTY_FIELD, ERROR );
+    }
+
+    # Target version can never be blank.
+    if ( ( $t_version_count > 0 ) && ( $p_new_issue_data->target_version == '' ) ) {
+        error_parameters( 'Target Version' );
+        trigger_error(ERROR_EMPTY_FIELD, ERROR );
+    }
+
+    # When resolving, fixed in version cannot be blank.
+    if ( ( $p_new_issue_data->status == CLOSED ) && ( $p_new_issue_data->resolution == FIXED ) && ( $t_version_count > 0 ) && ( $p_new_issue_data->fixed_in_version == '' ) ) {
+        error_parameters( 'Fixed in Version' );
+        trigger_error(ERROR_EMPTY_FIELD, ERROR );
+    }
+    # End by PeterV.
 }
 
 /**
@@ -215,6 +236,21 @@ function custom_function_default_issue_update_notify( $p_issue_id ) {
  * @return void
  */
 function custom_function_default_issue_create_validate( BugData $p_new_issue_data ) {
+    # By PeterV:
+    $t_version_count = count(version_get_all_rows($p_new_issue_data->project_id));
+
+    # Product version can never be blank.
+    if (($t_version_count > 0) && ($p_new_issue_data->version == '')) {
+        error_parameters('Product Version');
+        trigger_error(ERROR_EMPTY_FIELD, ERROR);
+    }
+
+    # Target version can never be blank.
+    if (($t_version_count > 0) && ($p_new_issue_data->target_version == '')) {
+        error_parameters('Target Version');
+        trigger_error(ERROR_EMPTY_FIELD, ERROR);
+    }
+    # End by PeterV.
 }
 
 /**

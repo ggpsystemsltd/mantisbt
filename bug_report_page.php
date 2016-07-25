@@ -271,7 +271,7 @@ if( $t_show_attachments ) {
 	if( $t_show_reproducibility ) {
 ?>
 			<div class="field-container">
-				<label><span><?php print_documentation_link( 'reproducibility' ) ?></span></label>
+				<label class="required"><span><?php print_documentation_link( 'reproducibility' ) ?></span></label>
 				<span class="input">
 					<select <?php echo helper_get_tab_index() ?> id="reproducibility" name="reproducibility">
 						<?php print_enum_string_option_list( 'reproducibility', $f_reproducibility ) ?>
@@ -299,7 +299,7 @@ if( $t_show_attachments ) {
 	if( $t_show_severity ) {
 ?>
 			<div class="field-container">
-				<label><span><?php print_documentation_link( 'severity' ) ?></span></label>
+				<label class="required"><span><?php print_documentation_link( 'severity' ) ?></span></label>
 				<span class="input">
 					<select <?php echo helper_get_tab_index() ?> id="severity" name="severity">
 						<?php print_enum_string_option_list( 'severity', $f_severity ) ?>
@@ -313,7 +313,7 @@ if( $t_show_attachments ) {
 	if( $t_show_priority ) {
 ?>
 			<div class="field-container">
-				<label><span><?php print_documentation_link( 'priority' ) ?></span></label>
+				<label class="required"><span><?php print_documentation_link( 'priority' ) ?></span></label>
 				<span class="input">
 					<select <?php echo helper_get_tab_index() ?> id="priority" name="priority">
 						<?php print_enum_string_option_list( 'priority', $f_priority ) ?>
@@ -421,7 +421,7 @@ if( $t_show_attachments ) {
 		}
 ?>
 			<div class="field-container">
-				<label><span><?php echo lang_get( 'product_version' ) ?></span></label>
+				<label class="required"><span><?php echo lang_get( 'product_version' ) ?></span></label>
 				<span class="select">
 					<select <?php echo helper_get_tab_index() ?> id="product_version" name="product_version">
 						<?php print_version_option_list( $f_product_version, $t_project_id, $t_product_version_released_mask ) ?>
@@ -496,7 +496,7 @@ if( $t_show_attachments ) {
 <?php # Target Version (if permissions allow)
 	if( $t_show_target_version ) { ?>
 			<div class="field-container">
-				<label><span><?php echo lang_get( 'target_version' ) ?></span></label>
+				<label class="required"><span><?php echo lang_get( 'target_version' ) ?></span></label>
 				<span class="select">
 					<select <?php echo helper_get_tab_index() ?> id="target_version" name="target_version">
 						<?php print_version_option_list( '', null, VERSION_FUTURE ) ?>
