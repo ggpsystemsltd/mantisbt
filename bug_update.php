@@ -375,6 +375,16 @@ if( $t_bug_note->note &&
 # Handle automatic assignment of issues.
 $t_updated_bug->status = bug_get_status_for_assign( $t_existing_bug->handler_id, $t_updated_bug->handler_id, $t_existing_bug->status, $t_updated_bug->status );
 
+# Handle automatic de-assignment of issues.
+if ((( config_get( 'bug_assigned_status' ) == $t_updated_bug->status )
+        or ( config_get( 'bug_developing_status' ) == $t_updated_bug->status ))
+    and ( $t_updated_bug->status == $t_existing_bug->status )
+    and ( 0 == $t_updated_bug->handler_id )
+    and ( ON == config_get( 'auto_set_status_to_assigned' ))) {
+    $t_updated_bug->status = config_get( 'bug_submit_status' );
+}
+
+
 # Allow a custom function to validate the proposed bug updates. Note that
 # custom functions are being deprecated in MantisBT. You should migrate to
 # the new plugin system instead.
