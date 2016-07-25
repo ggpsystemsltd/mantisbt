@@ -405,7 +405,18 @@ if( $t_show_handler || $t_show_due_date ) {
 	if( $t_show_handler ) {
 		echo '<th class="bug-assigned-to category">', lang_get( 'assigned_to' ), '</th>';
 		echo '<td class="bug-assigned-to">';
-		print_user_with_subject( $t_bug->handler_id, $t_bug_id );
+		if( $t_bug->handler_id < 9998 ) {
+			print_user_with_subject( $t_bug->handler_id, $t_bug_id );
+		} else {
+			switch( $t_bug->handler_id ) {
+				case 9998:
+					echo 'Support';
+					break;
+				case 9999:
+					echo 'Testing';
+					break;
+			}
+		}
 		echo '</td>';
 	} else {
 		$t_spacer += 2;

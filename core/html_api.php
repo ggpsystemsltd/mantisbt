@@ -1698,6 +1698,9 @@ function html_button_bug_assign_to( BugData $p_bug ) {
 		echo '<option value="0"></option>';
 	}
 
+	echo '<option value="9998">Support</option>';
+    echo '<option value="9999">Testers</option>';
+
 	# 0 means currently selected
 	print_assign_to_option_list( 0, $p_bug->project_id );
 	echo '</select>';

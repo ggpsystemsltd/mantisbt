@@ -325,6 +325,8 @@ if( $t_show_handler || $t_show_due_date ) {
 	if( access_has_project_level( config_get( 'update_bug_assign_threshold', config_get( 'update_bug_threshold' ) ) ) ) {
 		echo '<select ' . helper_get_tab_index() . ' id="handler_id" name="handler_id">';
 		echo '<option value="0"></option>';
+		echo '<option value="9998">Support</option>';
+		echo '<option value="9999">Testers</option>';
 		print_assign_to_option_list( $t_bug->handler_id, $t_bug->project_id );
 		echo '</select>';
 	} else {
