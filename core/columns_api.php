@@ -1326,6 +1326,43 @@ function print_column_status( BugData $p_bug, $p_columns_target = COLUMNS_TARGET
 	# print username instead of status
 	if( ( ON == config_get( 'show_assigned_names' ) ) && ( $p_bug->handler_id > 0 ) && ( access_has_project_level( config_get( 'view_handler_threshold' ), $p_bug->project_id ) ) ) {
 		printf( ' (%s)', prepare_user_name( $p_bug->handler_id ) );
+	    # if the issue is status "Resolved" or "Testing", show the assigned tester instead of the assigned developer
+        switch( $p_bug->status ) {
+            case 80:
+            case 83:
+                $t_user_table = db_get_table( 'mantis_user_table' );
+                $t_custom_field_string_table = db_get_table( 'mantis_custom_field_string_table' );
+                $query = "SELECT id
+                        FROM $t_user_table u
+                        WHERE u.username LIKE (
+                        SELECT value 
+                        FROM $t_custom_field_string_table s
+                        WHERE s.field_id=16 AND s.bug_id=$p_bug->id)";
+                $result = db_query_bound( $query, array() );
+                $t_testers = db_num_rows( $result );
+                if( $t_testers ) {
+                    $row = db_fetch_array( $result );
+                    $t_handler_id = $row['id'];
+                } else {
+                    $t_handler_id = $p_bug->reporter_id;
+                }
+                break;
+            default:
+                $t_handler_id = $p_bug->handler_id;
+                break;
+        }
+        if( $t_handler_id < 9998 ) {
+            printf( ' (%s)', prepare_user_name( $t_handler_id ) );
+        } else {
+            switch( $t_handler_id ) {
+                case 9998:
+                    echo ' (Support)';
+                    break;
+                case 9999:
+                    echo ' (Testing)';
+                    break;
+            }
+        }
 	}
 	echo '</td>';
 }
