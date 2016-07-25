@@ -228,7 +228,13 @@ foreach( $t_related_custom_field_ids as $t_id ) {
 	}
 
 	$t_def = custom_field_get_definition( $t_id );
-	if( !custom_field_set_value( $t_id, $t_bug_id, gpc_get_custom_field( 'custom_field_' . $t_id, $t_def['type'], $t_def['default_value'] ), false ) ) {
+	$t_custom_field_value = gpc_get_custom_field( 'custom_field_' . $t_id, $t_def['type'], $t_def['default_value'] );
+	if ( $t_def['name'] == "Sugar Case Number" ) {
+		if ( $t_custom_field_value <= 0 ) {
+			$t_custom_field_value = '';
+		}
+	}
+	if( !custom_field_set_value( $t_id, $t_bug_id, $t_custom_field_value, false ) ) {
 		error_parameters( lang_get_defaulted( custom_field_get_field( $t_id, 'name' ) ) );
 		trigger_error( ERROR_CUSTOM_FIELD_INVALID_VALUE, ERROR );
 	}

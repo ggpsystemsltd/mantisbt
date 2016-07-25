@@ -733,7 +733,16 @@ foreach( $t_related_custom_field_ids as $t_id ) {
 	echo '<tr>';
 	echo '<th class="bug-custom-field category">', string_display( lang_get_defaulted( $t_def['name'] ) ), '</th>';
 	echo '<td class="bug-custom-field" colspan="5">';
-	print_custom_field_value( $t_def, $t_id, $f_bug_id );
+# SugarCRM Case Integration
+	if ( string_display( lang_get_defaulted( $t_def['name'] )) == "Sugar Case Number" ) {
+# Get the internal SugarCRM ID number
+		$sugar_id = getSugarID( custom_field_get_value( $t_id, $f_bug_id ));
+        if ( $sugar_id != false ) echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record='.$sugar_id.'">';
+		print_custom_field_value( $t_def, $t_id, $f_bug_id );
+		if ( $sugar_id != false ) echo '</a>';
+	} else {
+        print_custom_field_value( $t_def, $t_id, $f_bug_id );
+	}
 	echo '</td></tr>';
 }
 
@@ -816,3 +825,34 @@ if( $t_show_history ) {
 html_page_bottom();
 
 last_visited_issue( $t_bug_id );
+
+/**
+ * UGLY HACK - Could be so much cleaner.
+ *
+ * @param null $hrid
+ * @return bool
+ */
+function getSugarID($hrid = NULL) {
+    if ($hrid!=NULL) {
+        $err_level = error_reporting(0);
+        $mysqli = new mysqli('svr-mysql.ggp.local', 'sugarcrm', 'UaxGAQUVjRC9QKFH', 'sugardb');
+        error_reporting($err_level);
+
+        if ($mysqli->connect_error) {
+            die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
+        }
+
+        if ($stmt = $mysqli->prepare("SELECT id FROM cases WHERE case_number=?")) {
+            $stmt->bind_param("s", $hrid);
+            $stmt->execute();
+            $stmt->bind_result($sugarId);
+            $stmt->fetch();
+            $stmt->close();
+        }
+
+        $mysqli->close();
+        return $sugarId;
+    } else {
+        return false;
+    }
+}
