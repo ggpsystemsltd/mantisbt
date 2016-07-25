@@ -89,7 +89,24 @@ if( access_has_bug_level( config_get( 'show_monitor_list_threshold' ), $f_bug_id
 		<?php echo form_security_field( 'bug_monitor_add' ) ?>
 			<input type="hidden" name="bug_id" value="<?php echo (integer)$f_bug_id; ?>" />
 			<label for="bug_monitor_list_username"><?php echo lang_get( 'username' ) ?></label>
-			<input type="text" id="bug_monitor_list_username" name="username" />
+			<select name="username">
+				<?php
+				$t_user_table = db_get_table( 'mantis_user_table' );
+				$query = "SELECT id, username, realname
+					FROM $t_user_table u
+					WHERE u.enabled = 1 AND u.username NOT IN ('administrator', 'svn', 'testm')
+					ORDER BY u.realname, u.username";
+				$result = db_query( $query );
+                $t_num_users = db_num_rows( $result );
+
+                for ( $i = 0; $i < $t_num_users; $i++ ) {
+                    $row = db_fetch_array( $result );
+                    if ( !in_array( $row['id'], $t_users )) {
+                        echo '                  <option value="' . $row['username'] . '">' . $row['realname'] . '</option>';
+                    }
+                }
+				?>
+			</select>
 			<input type="submit" class="button" value="<?php echo lang_get( 'add_user_to_monitor' ) ?>" />
 		</form>
 		<?php } ?>

@@ -185,6 +185,8 @@ $f_report_stay			= gpc_get_bool( 'report_stay', false );
 $f_copy_notes_from_parent         = gpc_get_bool( 'copy_notes_from_parent', false );
 $f_copy_attachments_from_parent   = gpc_get_bool( 'copy_attachments_from_parent', false );
 
+$t_user_table = db_get_table( 'mantis_user_table' );
+
 $t_fields = config_get( 'bug_report_page_fields' );
 $t_fields = columns_filter_disabled( $t_fields );
 
@@ -585,6 +587,40 @@ if( $t_show_attachments ) {
 		}
 	} # foreach( $t_related_custom_field_ids as $t_id )
 ?>
+<?php
+// The "Users monitoring this issue" box starts here
+?>
+			<div class="field-container">
+				<label class="required">
+					<span><?php echo lang_get( 'users_monitoring_bug' ); ?></span>
+				</label>
+				<span class="input">
+<?php
+	$query = "SELECT id, username, realname
+		FROM $t_user_table u
+		WHERE u.enabled = 1 AND u.username NOT IN ('administrator', 'svn', 'testm')
+		ORDER BY u.realname, u.username";
+
+	$result = db_query( $query, Array() );
+	$num_users = db_num_rows( $result );
+	$t_logged_in_user_id = auth_get_current_user_id();
+
+	$x = 1;
+	for ( $i = 0; $i < $num_users; $i++ ) {
+		$row = db_fetch_array( $result );
+		$checked="";
+		if ( $row['id']==$t_logged_in_user_id ) $checked=' checked="checked"';
+		echo '<input ' . helper_get_tab_index() . 'type="checkbox"' . $checked . ' name="users[]" value="' . $row['username'] . '">' . $row['realname'] . '</input>' . PHP_EOL;
+		$x++;
+		if ( $x == 5 ) {
+			echo '<br/>' . PHP_EOL;
+			$x = 1;
+		}
+	}
+?>
+				</span>
+				<span class="label-style"></span>
+			</div>
 <?php
 	# File Upload (if enabled)
 	if( $t_show_attachments ) {

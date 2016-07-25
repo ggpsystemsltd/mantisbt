@@ -140,6 +140,9 @@ $f_copy_attachments_from_parent     = gpc_get_bool( 'copy_attachments_from_paren
 $f_tag_select                       = gpc_get_int( 'tag_select', 0 );
 $f_tag_string                       = gpc_get_string( 'tag_string', '' );
 
+$t_monitor_users					= gpc_get_string_array( 'users' );
+$t_bug_monitor_table				= db_get_table( 'mantis_bug_monitor_table' );
+
 if( access_has_project_level( config_get( 'roadmap_update_threshold' ), $t_bug_data->project_id ) ) {
 	$t_bug_data->target_version = gpc_get_string( 'target_version', '' );
 }
@@ -188,6 +191,11 @@ foreach( $t_related_custom_field_ids as $t_id ) {
 	}
 }
 
+# Monitoring users is mandatory
+if ( empty( $t_monitor_users )) {
+	error_parameters( "Users monitoring this issue" );
+	trigger_error( ERROR_EMPTY_FIELD, ERROR );
+}
 # Allow plugins to pre-process bug data
 $t_bug_data = event_signal( 'EVENT_REPORT_BUG_DATA', $t_bug_data );
 
@@ -223,6 +231,18 @@ foreach( $t_related_custom_field_ids as $t_id ) {
 	if( !custom_field_set_value( $t_id, $t_bug_id, gpc_get_custom_field( 'custom_field_' . $t_id, $t_def['type'], $t_def['default_value'] ), false ) ) {
 		error_parameters( lang_get_defaulted( custom_field_get_field( $t_id, 'name' ) ) );
 		trigger_error( ERROR_CUSTOM_FIELD_INVALID_VALUE, ERROR );
+	}
+}
+
+# Handle monitoring users
+if ( !empty( $t_monitor_users )) {
+	foreach ( $t_monitor_users as $t_user ) {
+		$t_user_id = user_get_id_by_name( $t_user );
+
+		# Insert monitoring record
+		$query = 'INSERT INTO ' . $t_bug_monitor_table . '( user_id, bug_id ) VALUES (' . db_param() . ',' . db_param()
+		 . ')';
+		db_query( $query, Array( (int) $t_user_id, (int) $t_bug_id ));
 	}
 }
 
