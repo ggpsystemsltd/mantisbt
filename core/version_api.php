@@ -536,7 +536,7 @@ function version_get_all_rows( $p_project_id, $p_released = null, $p_obsolete = 
  */
 function version_get_all_rows_with_subs( $p_project_id, $p_released = null, $p_obsolete = false ) {
 	db_param_push();
-	$t_project_where = helper_project_specific_where( $p_project_id );
+	$t_project_where = helper_project_specific_where( project_hierarchy_get_parent( $p_project_id, false, true ));
 
 	$t_query_params = array();
 

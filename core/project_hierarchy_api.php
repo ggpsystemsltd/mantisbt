@@ -120,9 +120,10 @@ function project_hierarchy_is_toplevel( $p_project_id, $p_show_disabled = false 
  * Returns the id of the project's parent (0 if top-level or not found)
  * @param integer $p_project_id    Project Identifier.
  * @param boolean $p_show_disabled Whether or not to consider projects which are disabled.
+ * @param boolean $p_top_project   Whether or not the project is a parent project itself
  * @return integer
  */
-function project_hierarchy_get_parent( $p_project_id, $p_show_disabled = false ) {
+function project_hierarchy_get_parent( $p_project_id, $p_show_disabled = false, $p_top_project=false ) {
 	global $g_cache_project_hierarchy;
 
 	project_hierarchy_cache( $p_show_disabled );
@@ -133,7 +134,15 @@ function project_hierarchy_get_parent( $p_project_id, $p_show_disabled = false )
 
 	foreach( $g_cache_project_hierarchy as $t_key => $t_value ) {
 		if( in_array( $p_project_id, $g_cache_project_hierarchy[$t_key] ) ) {
-			return $t_key;
+            if( $p_top_project ) {
+                if( $t_key ) {
+                    return project_hierarchy_get_parent( $t_key, $p_show_disabled, $p_top_project );
+                } else {
+                    return $p_project_id;
+                }
+            } else {
+                return $t_key;
+            }
 		}
 	}
 
