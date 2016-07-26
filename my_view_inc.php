@@ -69,6 +69,7 @@ $t_dir = $t_filter['dir'];
 $t_icon_path = config_get( 'icon_path' );
 $t_update_bug_threshold = config_get( 'update_bug_threshold' );
 $t_bug_resolved_status_threshold = config_get( 'bug_resolved_status_threshold' );
+$t_bug_closed_status_threshold = config_get( 'bug_closed_status_threshold' );
 $t_hide_status_default = config_get( 'hide_status_default' );
 $t_default_show_changed = config_get( 'default_show_changed' );
 
@@ -121,7 +122,7 @@ $c_filter['resolved'] = array(
 		'0' => META_FILTER_ANY,
 	),
 	FILTER_PROPERTY_STATUS => array(
-		'0' => $t_bug_resolved_status_threshold,
+		'0' => $t_bug_closed_status_threshold,
 	),
 	FILTER_PROPERTY_HIGHLIGHT_CHANGED => $t_default_show_changed,
 	FILTER_PROPERTY_REPORTER_ID => array(
@@ -146,7 +147,7 @@ $c_filter['resolved'] = array(
 		'0' => META_FILTER_ANY,
 	),
 );
-$t_url_link_parameters['resolved'] = FILTER_PROPERTY_STATUS . '=' . $t_bug_resolved_status_threshold . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_bug_resolved_status_threshold;
+$t_url_link_parameters['resolved'] = FILTER_PROPERTY_STATUS . '=' . $t_bug_closed_status_threshold . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_bug_closed_status_threshold;
 
 
 $c_filter['unassigned'] = filter_create_assigned_to_unresolved( helper_get_current_project(), 0 );
@@ -169,7 +170,7 @@ $c_filter['feedback'] = array(
 	),
 	FILTER_PROPERTY_HIGHLIGHT_CHANGED => $t_default_show_changed,
 	FILTER_PROPERTY_REPORTER_ID => array(
-		'0' => $t_current_user_id,
+		'0' => META_FILTER_ANY,
 	),
 	FILTER_PROPERTY_HANDLER_ID => array(
 		'0' => META_FILTER_ANY,
@@ -190,7 +191,77 @@ $c_filter['feedback'] = array(
 		'0' => META_FILTER_ANY,
 	),
 );
-$t_url_link_parameters['feedback'] = FILTER_PROPERTY_REPORTER_ID . '=' . $t_current_user_id . '&' . FILTER_PROPERTY_STATUS . '=' . config_get( 'bug_feedback_status' ) . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
+$t_url_link_parameters['feedback'] = FILTER_PROPERTY_STATUS . config_get( 'bug_feedback_status' ) . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
+
+$c_filter['merge'] = array(
+	FILTER_PROPERTY_CATEGORY_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_SEVERITY => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_STATUS => array(
+		'0' => config_get( 'bug_merge_status' ),
+	),
+	FILTER_PROPERTY_HIGHLIGHT_CHANGED => $t_default_show_changed,
+	FILTER_PROPERTY_REPORTER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_HANDLER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_RESOLUTION => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_BUILD => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_VERSION => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_HIDE_STATUS => array(
+		'0' => $t_hide_status_default,
+	),
+	FILTER_PROPERTY_MONITOR_USER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+);
+$t_url_link_parameters['merge'] = FILTER_PROPERTY_STATUS . config_get( 'bug_merge_status' ) . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
+
+$c_filter['on_hold'] = array(
+	FILTER_PROPERTY_CATEGORY_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_SEVERITY => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_STATUS => array(
+		'0' => config_get( 'bug_on_hold_status' ),
+	),
+	FILTER_PROPERTY_HIGHLIGHT_CHANGED => $t_default_show_changed,
+	FILTER_PROPERTY_REPORTER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_HANDLER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_RESOLUTION => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_BUILD => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_VERSION => array(
+		'0' => META_FILTER_ANY,
+	),
+	FILTER_PROPERTY_HIDE_STATUS => array(
+		'0' => $t_hide_status_default,
+	),
+	FILTER_PROPERTY_MONITOR_USER_ID => array(
+		'0' => META_FILTER_ANY,
+	),
+);
+$t_url_link_parameters['on_hold'] = FILTER_PROPERTY_STATUS . config_get( 'bug_on_hold_status' ) . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
 
 $c_filter['verify'] = array(
 	FILTER_PROPERTY_CATEGORY_ID => array(
@@ -225,7 +296,7 @@ $c_filter['verify'] = array(
 		'0' => META_FILTER_ANY,
 	),
 );
-$t_url_link_parameters['verify'] = FILTER_PROPERTY_REPORTER_ID . '=' . $t_current_user_id . '&' . FILTER_PROPERTY_STATUS . '=' . $t_bug_resolved_status_threshold;
+$t_url_link_parameters['verify'] = FILTER_PROPERTY_STATUS . '=' . $t_bug_resolved_status_threshold;
 
 $c_filter['my_comments'] = array(
 	FILTER_PROPERTY_CATEGORY_ID => array(
