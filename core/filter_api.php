@@ -416,6 +416,18 @@ function filter_field_is_myself( $p_field_value ) {
 }
 
 /**
+ *  Checks the supplied value to see if it is a NONBLANK value.
+ * @param string $p_field_value The value to check.
+ * @return boolean true for "NONBLANK" values and false for others.
+ */
+function filter_field_is_nonblank( $p_field_value ) {
+	if( ( $p_field_value === 'nonblank' ) || ( $p_field_value === '[non-blank]' ) || ( META_FILTER_NONBLANK == $p_field_value ) ) {
+		return true;
+	}
+	return false;
+}
+
+/**
  * Filter per page
  * @param array   $p_filter   Filter.
  * @param integer $p_count    Count.
@@ -737,6 +749,9 @@ function filter_ensure_valid_filter( array $p_filter_arr ) {
 				}
 				if( ( $t_filter_value === 'none' ) || ( $t_filter_value === '[none]' ) ) {
 					$t_filter_value = META_FILTER_NONE;
+				}
+				if( ( $t_filter_value === 'non-blank' ) || ( $t_filter_value === '[non-blank]' ) ) {
+					$t_filter_value = META_FILTER_NONBLANK;
 				}
 				# Ensure the filter property has the right type - see #20087
 				switch( $t_multi_field_type ) {
@@ -1312,7 +1327,7 @@ function filter_get_bug_rows_query_clauses( array $p_filter, $p_project_id = nul
 			$t_project_ids = array_map( 'intval', $t_filter[FILTER_PROPERTY_PROJECT_ID] );
 		}
 
-		$t_include_sub_projects = (( count( $t_project_ids ) == 1 ) && ( ( $t_project_ids[0] == META_FILTER_CURRENT ) || ( $t_project_ids[0] == ALL_PROJECTS ) ) );
+		$t_include_sub_projects = true;
 	}
 
 	log_event( LOG_FILTERING, 'project_ids = @P' . implode( ', @P', $t_project_ids ) );
@@ -2105,6 +2120,10 @@ function filter_get_bug_rows_query_clauses( array $p_filter, $p_project_id = nul
 
 							# but also add those _not_ present in the custom field string table
 							array_push( $t_filter_array, '{bug}.id NOT IN (SELECT bug_id FROM {custom_field_string} WHERE field_id=' . $t_cfid . ')' );
+						} elseif( filter_field_is_nonblank( $t_filter_member ) ) {
+							# add META_FILTER_NONBLANK handling
+							# @TODO pretty sure this isn't "the new hotness" - should be db_helper_like(), no?
+							array_push( $t_filter_array, $t_table_name . '.value != ""' );
 						}
 
 						switch( $t_def['type'] ) {
@@ -2159,13 +2178,15 @@ function filter_get_bug_rows_query_clauses( array $p_filter, $p_project_id = nul
 				' OR ' . db_helper_like( '{bug_text}.description' ) .
 				' OR ' . db_helper_like( '{bug_text}.steps_to_reproduce' ) .
 				' OR ' . db_helper_like( '{bug_text}.additional_information' ) .
-				' OR ' . db_helper_like( '{bugnote_text}.note' );
+				' OR ' . db_helper_like( '{bugnote_text}.note' ) .
+				' OR ' . "{bug}.id IN " . db_param();
 
 			$t_where_params[] = $c_search;
 			$t_where_params[] = $c_search;
 			$t_where_params[] = $c_search;
 			$t_where_params[] = $c_search;
 			$t_where_params[] = $c_search;
+			$t_where_params[] = '( SELECT DISTINCT bug_id FROM ' . db_get_table( 'mantis_custom_field_string_table' ) . ' WHERE value LIKE "' . $c_search . '")';
 
 			if( is_numeric( $t_search_term ) ) {
 				# PostgreSQL on 64-bit OS hack (see #14014)
@@ -2405,6 +2426,8 @@ function filter_draw_selection_area2( $p_page_number, $p_for_screen = true, $p_e
 					}
 				} else if( filter_field_is_none( $t_current ) ) {
 					$t_this_name = lang_get( 'none' );
+				} else if( filter_field_is_nonblank( $t_current ) ) {
+					$t_this_name = lang_get( 'nonblank' );
 				} else {
 					$t_this_name = user_get_name( $t_current );
 				}
@@ -2472,7 +2495,9 @@ function filter_draw_selection_area2( $p_page_number, $p_for_screen = true, $p_e
 				echo '<input type="hidden" name="', FILTER_PROPERTY_HANDLER_ID, '[]" value="', string_attribute( $t_current ), '" />';
 				$t_this_name = '';
 				if( filter_field_is_none( $t_current ) ) {
-					$t_this_name = lang_get( 'none' );
+					$t_this_name = lang_get('none');
+				} else if( filter_field_is_nonblank( $t_current ) ) {
+					$t_this_name = lang_get( 'nonblank' );
 				} else if( filter_field_is_any( $t_current ) ) {
 					$t_any_found = true;
 				} else if( filter_field_is_myself( $t_current ) ) {
@@ -3317,6 +3342,8 @@ function filter_draw_selection_area2( $p_page_number, $p_for_screen = true, $p_e
 									$t_any_found = true;
 								} else if( filter_field_is_none( $t_current ) ) {
 									$t_this_string = lang_get( 'none' );
+								} else if( filter_field_is_nonblank( $t_current ) ) {
+									$t_this_string = lang_get( 'nonblank' );
 								} else {
 									$t_this_string = $t_current;
 								}
@@ -4259,11 +4286,15 @@ function print_filter_custom_field( $p_field_id ) {
 			check_selected( $g_filter['custom_fields'][$p_field_id], META_FILTER_ANY, false );
 			echo '>[' . lang_get( 'any' ) . ']</option>';
 
-			# don't show META_FILTER_NONE for enumerated types as it's not possible for them to be blank
+			# don't show META_FILTER_NONE/META_FILTER_NONBLANK for enumerated types as it's not possible for them to be blank
 			if( !in_array( $t_accessible_custom_fields_types[$j], array( CUSTOM_FIELD_TYPE_ENUM, CUSTOM_FIELD_TYPE_LIST, CUSTOM_FIELD_TYPE_MULTILIST ) ) ) {
 				echo '<option value="' . META_FILTER_NONE . '"';
 				check_selected( $g_filter['custom_fields'][$p_field_id], META_FILTER_NONE, false );
 				echo '>[' . lang_get( 'none' ) . ']</option>';
+				# Non-blank menu item
+				echo '<option value="' . META_FILTER_NONBLANK . '"';
+				check_selected( $g_filter['custom_fields'][$p_field_id], META_FILTER_NONBLANK, false );
+				echo '>[' . lang_get( 'nonblank' ) . ']</option>';
 			}
 			if( is_array( $t_accessible_custom_fields_values[$j] ) ) {
 				$t_max_length = config_get( 'max_dropdown_length' );
