@@ -1325,7 +1325,6 @@ function print_column_status( BugData $p_bug, $p_columns_target = COLUMNS_TARGET
 
 	# print username instead of status
 	if( ( ON == config_get( 'show_assigned_names' ) ) && ( $p_bug->handler_id > 0 ) && ( access_has_project_level( config_get( 'view_handler_threshold' ), $p_bug->project_id ) ) ) {
-		printf( ' (%s)', prepare_user_name( $p_bug->handler_id ) );
 	    # if the issue is status "Resolved" or "Testing", show the assigned tester instead of the assigned developer
         switch( $p_bug->status ) {
             case 80:
@@ -1338,7 +1337,7 @@ function print_column_status( BugData $p_bug, $p_columns_target = COLUMNS_TARGET
                         SELECT value 
                         FROM $t_custom_field_string_table s
                         WHERE s.field_id=16 AND s.bug_id=$p_bug->id)";
-                $result = db_query_bound( $query, array() );
+                $result = db_query( $query, array() );
                 $t_testers = db_num_rows( $result );
                 if( $t_testers ) {
                     $row = db_fetch_array( $result );
