@@ -733,16 +733,26 @@ foreach( $t_related_custom_field_ids as $t_id ) {
 	echo '<tr>';
 	echo '<th class="bug-custom-field category">', string_display( lang_get_defaulted( $t_def['name'] ) ), '</th>';
 	echo '<td class="bug-custom-field" colspan="5">';
-# SugarCRM Case Integration
-	if ( string_display( lang_get_defaulted( $t_def['name'] )) == "Sugar Case Number" ) {
-# Get the internal SugarCRM ID number
-		$sugar_id = getSugarID( custom_field_get_value( $t_id, $f_bug_id ));
-        if ( $sugar_id != false ) echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record='.$sugar_id.'">';
-		print_custom_field_value( $t_def, $t_id, $f_bug_id );
-		if ( $sugar_id != false ) echo '</a>';
-	} else {
-        print_custom_field_value( $t_def, $t_id, $f_bug_id );
-	}
+    switch( $t_id ){
+        case 9:
+            # SugarCRM Case Number hyperlinking
+            $sugar_id = getSugarID(custom_field_get_value($t_id, $f_bug_id));
+            if ($sugar_id != false) echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record=' . $sugar_id . '">';
+            break;
+        case 13:
+            # Test Cases in <pre> tags
+            echo '<pre>';
+            break;
+    }
+    print_custom_field_value( $t_def, $t_id, $f_bug_id );
+    switch( $t_id ){
+        case 9:
+            if ($sugar_id != false) echo '</a>';
+            break;
+        case 13:
+            echo '</pre>';
+            break;
+    }
 	echo '</td></tr>';
 }
 
