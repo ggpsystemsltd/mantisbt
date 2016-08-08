@@ -1193,10 +1193,10 @@ function custom_field_set_value( $p_field_id, $p_bug_id, $p_value, $p_log_insert
 	$t_name = custom_field_get_field( $p_field_id, 'name' );
 	$t_type = custom_field_get_field( $p_field_id, 'type' );
 
-    // $p_field_id==13 (Test Cases) AND $p_value LIKE '%~%' REPLACE '~' WITH '&#9;' (Tab)
+    // $p_field_id==13 (Test Cases) AND $p_value LIKE '%¦%' REPLACE '¦' WITH '&#9;' (Tab)
     if( $p_field_id == 13 ) {
-        if( strpos( $p_value, '~' ) !== false ) {
-            $p_value = preg_replace( '/~/', '&#9;', $p_value );
+        if( strpos( $p_value, '¦' ) !== false ) {
+            $p_value = preg_replace( '/¦/', '&#9;', $p_value );
         }
     }
 

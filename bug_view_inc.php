@@ -736,21 +736,33 @@ foreach( $t_related_custom_field_ids as $t_id ) {
     switch( $t_id ){
         case 9:
             # SugarCRM Case Number hyperlinking
-            $sugar_id = getSugarID(custom_field_get_value($t_id, $f_bug_id));
-            if ($sugar_id != false) echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record=' . $sugar_id . '">';
+            $sugar_id = getSugarID( custom_field_get_value( $t_id, $f_bug_id ));
+            if ( $sugar_id != false ) {
+                echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record=' . $sugar_id . '">';
+            }
             break;
         case 13:
-            # Test Cases in <pre> tags
-            echo '<pre>';
+            # Test Cases in <pre> tags when value contains "[TAB]"
+            $t_pre_flag = false;
+            if( strpos( custom_field_get_value( $t_id, $f_bug_id ), "\t" ) !== false ) {
+                $t_pre_flag = true;
+                echo '<pre>';
+            }
             break;
     }
     print_custom_field_value( $t_def, $t_id, $f_bug_id );
     switch( $t_id ){
         case 9:
-            if ($sugar_id != false) echo '</a>';
+            # SugarCRM Case Number hyperlinking
+            if( $sugar_id != false ) {
+                echo '</a>';
+            }
             break;
         case 13:
-            echo '</pre>';
+            # Test Cases in <pre> tags when value contains "[TAB]"
+            if( $t_pre_flag == true ) {
+                echo '</pre>';
+            }
             break;
     }
 	echo '</td></tr>';
