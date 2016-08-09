@@ -676,7 +676,17 @@ if( $t_show_summary ) {
 if( $t_show_description ) {
 	echo '<tr>';
 	echo '<th class="bug-description category">', lang_get( 'description' ), '</th>';
-	echo '<td class="bug-description" colspan="5">', $t_description, '</td>';
+	echo '<td class="bug-description" colspan="5">';
+    $t_pre_flag = false;
+    if( strpos( $t_description, "\t" ) !== false ) {
+        $t_pre_flag = true;
+        echo '<pre>';
+    }
+    echo $t_description;
+    if( $t_pre_flag ) {
+        echo '</pre>';
+    }
+    echo '</td>';
 	echo '</tr>';
 }
 
@@ -684,7 +694,17 @@ if( $t_show_description ) {
 if( $t_show_steps_to_reproduce ) {
 	echo '<tr>';
 	echo '<th class="bug-steps-to-reproduce category">', lang_get( 'steps_to_reproduce' ), '</th>';
-	echo '<td class="bug-steps-to-reproduce" colspan="5">', $t_steps_to_reproduce, '</td>';
+	echo '<td class="bug-steps-to-reproduce" colspan="5">';
+    $t_pre_flag = false;
+    if( strpos( $t_steps_to_reproduce, "\t" ) !== false ) {
+        $t_pre_flag = true;
+        echo '<pre>';
+    }
+    echo $t_steps_to_reproduce;
+    if( $t_pre_flag ) {
+        echo '</pre>';
+    }
+    echo '</td>';
 	echo '</tr>';
 }
 
@@ -692,7 +712,17 @@ if( $t_show_steps_to_reproduce ) {
 if( $t_show_additional_information ) {
 	echo '<tr>';
 	echo '<th class="bug-additional-information category">', lang_get( 'additional_information' ), '</th>';
-	echo '<td class="bug-additional-information" colspan="5">', $t_additional_information, '</td>';
+	echo '<td class="bug-additional-information" colspan="5">';
+    $t_pre_flag = false;
+    if( strpos( $t_additional_information, "\t" ) !== false ) {
+        $t_pre_flag = true;
+        echo '<pre>';
+    }
+    echo $t_additional_information;
+    if( $t_pre_flag ) {
+        echo '</pre>';
+    }
+    echo '</td>';
 	echo '</tr>';
 }
 
@@ -741,8 +771,13 @@ foreach( $t_related_custom_field_ids as $t_id ) {
                 echo '<a href="http://crm.ggpsystems.co.uk/crm/index.php?module=Cases&action=DetailView&record=' . $sugar_id . '">';
             }
             break;
+        case 5:
+        case 6:
+        case 7:
+        case 10:
         case 13:
-            # Test Cases in <pre> tags when value contains "[TAB]"
+            # Documentation Update Required, Expected Results, Actual Results, Resolution Details and Test Cases in
+            # <pre> tags when value contains "[TAB]"
             $t_pre_flag = false;
             if( strpos( custom_field_get_value( $t_id, $f_bug_id ), "\t" ) !== false ) {
                 $t_pre_flag = true;
@@ -758,8 +793,13 @@ foreach( $t_related_custom_field_ids as $t_id ) {
                 echo '</a>';
             }
             break;
+        case 5:
+        case 6:
+        case 7:
+        case 10:
         case 13:
-            # Test Cases in <pre> tags when value contains "[TAB]"
+            # Documentation Update Required, Expected Results, Actual Results, Resolution Details and Test Cases in
+            # <pre> tags when value contains "[TAB]"
             if( $t_pre_flag == true ) {
                 echo '</pre>';
             }

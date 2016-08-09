@@ -329,7 +329,11 @@ class BugData {
 			case 'description':
 			case 'steps_to_reproduce':
 			case 'additional_information':
-				# MySQL 4-bytes UTF-8 chars workaround #21101
+			    # @TODO '¬' to '[TAB]' here
+                if( strpos( $p_value, '¬' ) !== false ) {
+                    $p_value = preg_replace( '/¬/', "\t", $p_value );
+                }
+                # MySQL 4-bytes UTF-8 chars workaround #21101
 				$p_value = db_mysql_fix_utf8( $p_value );
 				break;
 

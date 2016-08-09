@@ -294,7 +294,15 @@ $t_num_notes = count( $t_bugnotes );
 					break;
 			}
 
+			$t_pre_flag = false;
+			if( strpos( $t_bugnote->note, "\t" ) !== false ) {
+				$t_pre_flag = true;
+				echo '<pre>';
+			}
 			echo string_display_links( $t_bugnote->note );
+			if( $t_pre_flag ) {
+				echo '</pre>';
+			}
 		?>
 	</td>
 </tr>
