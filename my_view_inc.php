@@ -114,6 +114,7 @@ $t_url_link_parameters['recent_mod'] = FILTER_PROPERTY_HIDE_STATUS . '=none';
 $c_filter['reported'] = filter_create_reported_by( helper_get_current_project(), $t_current_user_id );
 $t_url_link_parameters['reported'] = FILTER_PROPERTY_REPORTER_ID . '=' . $t_current_user_id . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
 
+// @GGP resolved is actually closed
 $c_filter['resolved'] = array(
 	FILTER_PROPERTY_CATEGORY_ID => array(
 		'0' => META_FILTER_ANY,
@@ -263,6 +264,7 @@ $c_filter['on_hold'] = array(
 );
 $t_url_link_parameters['on_hold'] = FILTER_PROPERTY_STATUS . config_get( 'bug_on_hold_status' ) . '&' . FILTER_PROPERTY_HIDE_STATUS . '=' . $t_hide_status_default;
 
+# @GGP verify is resolved
 $c_filter['verify'] = array(
 	FILTER_PROPERTY_CATEGORY_ID => array(
 		'0' => META_FILTER_ANY,
@@ -275,7 +277,7 @@ $c_filter['verify'] = array(
 	),
 	FILTER_PROPERTY_HIGHLIGHT_CHANGED => $t_default_show_changed,
 	FILTER_PROPERTY_REPORTER_ID => array(
-		'0' => $t_current_user_id,
+		'0' => META_FILTER_ANY,
 	),
 	FILTER_PROPERTY_HANDLER_ID => array(
 		'0' => META_FILTER_ANY,
